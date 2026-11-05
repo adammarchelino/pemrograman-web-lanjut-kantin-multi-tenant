@@ -7,6 +7,7 @@ use Database\Factories\ModifierGroupFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ModifierGroup extends Model
@@ -33,5 +34,12 @@ class ModifierGroup extends Model
     public function options(): HasMany
     {
         return $this->hasMany(ModifierOption::class, 'group_id');
+    }
+
+    /** @return BelongsToMany<Menu, $this> */
+    public function menus(): BelongsToMany
+    {
+        return $this->belongsToMany(Menu::class, 'menu_modifier_groups')
+            ->withPivot(['tenant_id', 'sort_order'])->withTimestamps();
     }
 }

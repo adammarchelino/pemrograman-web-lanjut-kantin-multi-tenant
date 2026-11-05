@@ -5,6 +5,7 @@ namespace App\Modules\Catalog\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Tenant;
+use App\Modules\Catalog\Services\MenuStockService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,6 +14,8 @@ use Illuminate\Http\Request;
 final class TenantMenuController extends Controller
 {
     use AuthorizesRequests;
+
+    public function __construct(private MenuStockService $stock) {}
 
     public function index(Tenant $tenant): JsonResponse
     {
@@ -34,8 +37,8 @@ final class TenantMenuController extends Controller
     {
         $this->authorize('update', $menu);
         $data = $request->validate(['is_available' => ['required', 'boolean']]);
-        $menu->update(['is_available' => $data['is_available']]);
+        $this->stock->setAvailability($menu, (bool) $data['is_available']);
 
-        return response()->json(['ok' => true, 'is_available' => $menu->is_available]);
+        return response()->json(['ok' => true, 'is_available' => (bool) $data['is_available']]);
     }
 }
